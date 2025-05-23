@@ -1,8 +1,9 @@
 import { PrismaClient, Prisma } from "../generated/prisma";
+import { addDays } from 'date-fns';
 
 const prisma = new PrismaClient();
 
-const itineraryData: Prisma.ItineraryCreateInput[] = [
+const itineraryData: Omit<Prisma.ItineraryCreateInput, 'dayPlans'>[] = [
   {
     name: 'Summer European Adventure',
     startDate: new Date('2024-07-01'),
@@ -24,8 +25,20 @@ const itineraryData: Prisma.ItineraryCreateInput[] = [
 ];
 
 export async function main() {
-  for (const i of itineraryData) {
-    await prisma.itinerary.create({ data: i });
+  for (const data of itineraryData) {
+    const currentItineraryStartDate = data.startDate;
+    const createdItinerary = await prisma.itinerary.create({
+      data: {
+        ...data,
+        dayPlans: {
+          create: [
+            { date: currentItineraryStartDate, title: 'Day Plan 1: Arrival & Local Exploration' },
+            { date: addDays(currentItineraryStartDate, 1), title: 'Day Plan 2: Main Activity Day' },
+            { date: addDays(currentItineraryStartDate, 2), title: 'Day Plan 3: Departure & Souvenirs' },
+          ],
+        },
+      },
+    });
   }
 }
 

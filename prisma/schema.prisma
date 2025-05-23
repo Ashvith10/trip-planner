@@ -16,4 +16,16 @@ model Itinerary {
   description String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  dayPlans DayPlan[]
+}
+
+model DayPlan {
+  id String @id @default(uuid())
+  date DateTime @db.Date
+  title String
+  description String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  itineraryId String
+  itinerary Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
 }
