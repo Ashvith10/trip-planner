@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  prisma-migrate:
+    container_name: prisma-migrate-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+    networks:
+      - trip-planner-postgres
+    env_file:
+      - ./.env
+    depends_on:
+      trip-planner-postgres:
+        condition: service_healthy
+    command: ["npx", "prisma", "migrate", "dev"]
+    restart: no
+  trip-planner-nextjs:
+    container_name: trip-planner-nextjs-dev
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile
+    volumes:
+      - .:/app
+      - /app/.next
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    env_file:
+      - ./.env
+    networks:
+      - trip-planner-postgres
+    command: >
+      sh -c "
+        if [ -f yarn.lock ]; then yarn dev;
+        elif [ -f package.json ]; then npm run dev;
+        elif [ -f pnpm-lock.yaml ]; then pnpm dev;
+        fi
+      "
+    depends_on:
+      trip-planner-postgres:
+        condition: service_healthy
+      prisma-migrate:
+        condition: service_completed_successfully
+  trip-planner-postgres:
+    container_name: trip-planner-postgres-dev
+    image: postgres:17.5-alpine
+    restart: always
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    ports:
+      - 5432:5432
+    networks:
+      - trip-planner-postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+networks:
+  trip-planner-postgres:
