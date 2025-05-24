@@ -2,6 +2,23 @@
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## Technologies used
+
+- Docker: Reproducible, ephemeral containerization. Since it is more popular than Podman, Nix or Guix, hence the choice. For production, I've made use
+  of a multi-stage Dockerfile to optimize image size and make it easier to read.
+
+- TypeScript: Type safety and compile-time checks for JavaScript.
+
+- NextJS: For a monolithic web application containing both front-end and back-end. I have also enabled standalone builds to further reduce the size.
+
+- Tailwind: Utility-driven CSS library, also a shadcn dependency.
+
+- shadcn/ui: For quickly building web pages with pre-styled, pre-defined components.
+
+- PostgreSQL: Since I am used to working on PostgreSQL, hence the choice.
+
+- Prisma: To design schema and migrations for the database.
+
 ## Getting Started
 
 Before running this project, please ensure that Docker and Docker Compose is present in the system with relevant permissions and configurations.
@@ -29,7 +46,7 @@ DATABASE_URL="postgresql://postgres@trip-planner-postgres:5432/trip-planner?sche
   - To run the production server:
 
   ```console
-  docker-compose -f docker-compose.dev.yml up --build
+  docker-compose -f docker-compose.prod.yml up --build
   ```
 - Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
