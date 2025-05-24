@@ -9,23 +9,23 @@ datasource db {
 }
 
 model Itinerary {
-  id String @id @default(uuid())
-  name String
-  startDate DateTime @db.Date
-  endDate DateTime @db.Date
+  id          String    @id @default(uuid())
+  name        String
+  startDate   DateTime  @db.Date
+  endDate     DateTime  @db.Date
   description String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  dayPlans DayPlan[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  dayPlans    DayPlan[]
 }
 
 model DayPlan {
-  id String @id @default(uuid())
-  date DateTime @db.Date
-  title String
+  id          String    @id @default(uuid())
+  date        DateTime  @db.Date
+  title       String
   description String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
   itineraryId String
-  itinerary Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
+  itinerary   Itinerary @relation(fields: [itineraryId], references: [id], onDelete: Cascade)
 }
