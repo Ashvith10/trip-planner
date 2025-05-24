@@ -1,36 +1,59 @@
+# trip-planner
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
 
-First, run the development server:
+Before running this project, please ensure that Docker and Docker Compose is present in the system with relevant permissions and configurations.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+- First, clone the following project onto a local machine:
+
+```console
+$ git clone https://codeberg.org/Ashvith/trip-planner.git
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- `cd` inside the `trip-planner` directory and create a `.env` file with the following content:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```console
+DATABASE_URL="postgresql://postgres@trip-planner-postgres:5432/trip-planner?schema=public"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- Now, run the services using Docker Compose:
 
-## Learn More
+  - To run the development server:
 
-To learn more about Next.js, take a look at the following resources:
+  ```console
+  docker-compose -f docker-compose.dev.yml up --build
+  ```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+  - To run the production server:
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+  ```console
+  docker-compose -f docker-compose.dev.yml up --build
+  ```
+- Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-## Deploy on Vercel
+## Schema
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+To check the schema files, please check the [prisma/schema.prisma](prisma/schema.prisma) file.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+There are two resources being used:
+- `itinerary` - a trip is represented with a singular `itinerary` resource. It consists of a `name`, a `startDate`, an `endDate`,
+   an optional `description` and multiple `dayPlan` resources.
+- `dayPlan` - an `itinerary` may have multiple `dayplan` resources. Each `dayPlan` has a `date`, a `title` and an optional
+  `description`. When an `itinerary` object is deleted, all associated `dayPlan` resources must be automatically deleted.
+
+## API
+
+The utility `next-list` was used to quickly list all the endpoints.
+
+| Method | Route                                                      | Description                                                                                                                                                                  |
+|--------|------------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| GET    | /api/itineraries/route                                     | Get all the `itinerary` resources.                                                                                                                                           |
+| POST   | /api/itineraries/route                                     | Create a new `itinerary` resource. Auto-generates `dayPlan`, based on the difference between `startDate` and `endDate`.                                                      |
+| GET    | /api/itineraries/[itineraryId]/route                       | Get a single `itinerary` resource, based on the parameter `itineraryId`. Returning data includes the `dayPlan` resources in addition to the `itinerary` resource.            |
+| PUT    | /api/itineraries/[itineraryId]/route                       | Update a single `itinerary` resource, based on the parameter `itineraryId`. Returning data includes the `dayPlan` resources in addition to the updated `itinerary` resource. |
+| DELETE | /api/itineraries/[itineraryId]/route                       | Delete a single `itinerary` resource, based on the parameter `itineraryId`.                                                                                                  |
+| POST   | /api/itineraries/[itineraryId]/day-plans/route             | Create a new `dayPlan` resource, based on the parameter `itineraryId`.                                                                                                       |
+| PUT    | /api/itineraries/[itineraryId]/day-plans/[dayPlanId]/route | Update a single `dayPlan` resource, based on the parameter `itineraryId` and `dayPlanId`. Returning data includes the updated `dayPlan` resource.                            |
+| DELETE | /api/itineraries/[itineraryId]/day-plans/[dayPlanId]/route | Delete a single `dayPlan` resource, based on the parameter `itineraryId` and `dayPlanId`.                                                                                    |
